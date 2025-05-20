@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Signals Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="blur-background"></div>
+    
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">BINARY<span>SIGNALS</span></h1>
+            <div class="current-time" id="current-time">00:00:00</div>
+        </header>
+
+        <main class="main-content">
+            <div class="control-panel">
+                <div class="control-group">
+                    <label for="asset-select">Актив:</label>
+                    <div class="select-wrapper">
+                        <select id="asset-select" class="select-box">
+                            <option value="EUR/USD">EUR/USD</option>
+                            <option value="GBP/USD">GBP/USD</option>
+                            <option value="USD/JPY">USD/JPY</option>
+                            <option value="BTC/USD">BTC/USD</option>
+                            <option value="ETH/USD">ETH/USD</option>
+                            <option value="Gold">Gold</option>
+                            <option value="Oil">Oil</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label>Экспирация:</label>
+                    <div class="expiry-buttons">
+                        <button class="expiry-btn" data-time="15">15с</button>
+                        <button class="expiry-btn" data-time="30">30с</button>
+                        <button class="expiry-btn active" data-time="60">1м</button>
+                        <button class="expiry-btn" data-time="180">3м</button>
+                        <button class="expiry-btn" data-time="300">5м</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <img src="imgs/dark-blue.jpg" alt="Mountains" class="chart-bg">
+                <canvas id="price-chart"></canvas>
+            </div>
+
+            <div class="instructions" id="instr">
+                <h3>Как пользоваться:</h3>
+                <ol>
+                    <li>Выберите валютную пару</li>
+                    <li>Установите время экспирации</li>
+                    <li>Нажмите "Получить сигнал"</li>
+                    <li>Следуйте рекомендациям</li>
+                </ol>
+            </div>
+
+            <div class="signal-control">
+                <button class="get-signal-btn" id="get-signal-btn">
+                    <span>Получить сигнал</span>
+                </button>
+                
+                <div class="analyzing-container hidden" id="analyzing-container">
+                    <div class="analyzing-loader"></div>
+                    <div class="analyzing-text">Анализируем график...</div>
+                </div>
+            </div>
+
+            <div class="signal-result hidden" id="signal-result">
+                    <div class="signal-grid">
+                        <div class="signal-card">
+                            <div class="signal-card-title"></div>
+                            <div class="signal-card-value" id="traders-percent">75%</div>
+                            <div class="signal-card-desc" id="traders-direction">в повышение</div>
+                        </div>
+                        
+                        <div class="signal-card">
+                            <div class="signal-card-title"></div>
+                            <div class="signal-card-desc" id="expiry-time">До входа в сделку</div>
+                            <div class="signal-card-value" id="time-left">00:15</div>
+                        </div>
+                    </div>
+                    
+                    <div class="final-direction" id="final-direction">
+                        <div class="direction-text" id="direction-text">ПОВЫШЕНИЕ</div>
+                        <div class="direction-icon">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                    </div>
+                </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
