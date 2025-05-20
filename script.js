@@ -209,49 +209,47 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 3000);
     });
     
-    function generateSignal() {
+    let isFirstExpiryCompleted = false;
+
+// Глобальные переменные
+
+let isInTrade = false;
+
+function generateSignal() {
     const activeExpiryBtn = document.querySelector('.expiry-btn.active');
     const expiryTime = parseInt(activeExpiryBtn.dataset.time);
     const isUp = Math.random() > 0.5;
-    const percent = Math.floor(Math.random() * 20) + 75;
+    const percent = Math.floor(Math.random() * 20) + 73;
 
     // Рассчитываем время окончания экспирации
     const now = new Date();
     now.setSeconds(now.getSeconds() + expiryTime);
     const expiryTimeString = now.toLocaleTimeString('ru-RU', { hour12: false });
 
-    // Формируем текст сигнала
+    // Формируем направление
+    const direction = isUp ? 'повышение' : 'понижение';
     const directionText = isUp ? 'ПОВЫШЕНИЕ' : 'ПОНИЖЕНИЕ';
-    const directionIcon = isUp ? '↑' : '↓';
-    const directionClass = isUp ? 'up' : 'down';
 
     // Создаем HTML для сигнала
     const signalHTML = `
-        <div class="signal-header">
-            <span class="robot-icon">🤖</span>
-            <span class="signal-title">СИГНАЛ ПОЛУЧЕН</span>
-        </div>
-        <div class="signal-stats">
-            <div class="percent-label">Точность сигнала</div>
-            <div class="percent-value">${percent}%</div>
-            <div class="direction-arrow ${directionClass}">${directionIcon}</div>
-        </div>
-        <div class="signal-time">
-            Вход в ${isUp ? 'ПОВЫШЕНИЕ' : 'ПОНИЖЕНИЕ'} в ${expiryTimeString}
+        <div class="signal-message">
+            <p><span class="text-bold">${percent}</span>% лучших трейдеров сделали ставку на </span><span class="text-bold">${direction}</span><span class="text-light">.</span></p>
+            <p><span class="text-light">Ровно в </span><span class="text-bold">${expiryTimeString}</span><span class="text-light"> ставим </span><span class="text-bold">${direction}</span><span class="text-light">!</span></p>
         </div>
     `;
 
     // Вставляем сформированный HTML
     document.querySelector('.signal-card').innerHTML = signalHTML;
-    document.getElementById('expiry-time').textContent = `До входа в сделку:`;
 
     // Настройка блока направления
     const directionBlock = document.getElementById('final-direction');
-    directionBlock.className = `final-direction ${directionClass}`;
+    directionBlock.className = `final-direction ${isUp ? 'up' : 'down'}`;
     document.getElementById('direction-text').textContent = directionText;
     directionBlock.querySelector('i').className = isUp ? 'fas fa-arrow-up' : 'fas fa-arrow-down';
 
+    // Запоминаем направление, но пока не применяем
     signalTrend = isUp ? 1 : -1;
+    isInTrade = false;
     signalResult.classList.remove('hidden');
 }
 
@@ -271,6 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         if (remaining <= 0) {
             clearInterval(countdown);
+            isInTrade = true; // Теперь можно применять направление графика
             
             // Второй этап - время самой сделки
             let dealRemaining = expiryTime;
@@ -279,13 +278,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const dealCountdown = setInterval(() => {
                 dealRemaining--;
                 
-                // Обновляем оба элемента
                 document.getElementById('expiry-time').textContent = `До окончания сделки:`;
                 updateDealTimeDisplay(dealRemaining);
                 
                 if (dealRemaining <= 0) {
                     clearInterval(dealCountdown);
-                    signalTrend = 0;
+                    signalTrend = 0; // Возвращаем нейтральное направление
+                    isInTrade = false;
                     setTimeout(() => {
                         signalResult.classList.add('hidden');
                         getSignalBtn.classList.remove('hidden');
@@ -302,7 +301,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const mins = Math.floor(remaining / 60);
         const secs = remaining % 60;
         timeLeftElement.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        document.getElementById('expiry-time').textContent = `До входа в сделку:`;
     }
     
     function updateDealTimeDisplay(seconds) {
@@ -318,7 +316,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const dataset = chart.data.datasets[0];
     const data = dataset.data;
     
-    // Получаем последнее реальное значение (не null)
     let lastRealValue = 50;
     for (let i = realLength - 1; i >= 0; i--) {
         if (data[i] !== null) {
@@ -327,29 +324,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Генерируем новое значение
+    // Генерируем новое значение с учетом направления
+    let trendMultiplier = isInTrade ? signalTrend : 0;
+    
     const newValue = lastRealValue + 
-        (signalTrend * (Math.random() * 0.2)) + 
-        ((Math.random() - 0.5) * 0.2);
+        (trendMultiplier * (Math.random() * 0.2)) + 
+        ((Math.random() - 0.5) * 0.1); // Уменьшил случайные колебания
 
-    // Правильно обновляем данные:
-    // 1. Удаляем первую точку
+    // Обновляем данные
     data.shift();
-    // 2. Добавляем новую точку в конец реальных данных
     data.splice(realLength - 1, 0, newValue);
-    // 3. Обрезаем массив до нужной длины
     data.length = realLength + paddingRight;
 
     // Обновляем цвет линии
     dataset.borderColor = 
-        signalTrend === 1 ? '#00b894' :
-        signalTrend === -1 ? '#d63031' :
+        trendMultiplier === 1 ? '#00b894' :
+        trendMultiplier === -1 ? '#d63031' :
         '#1c87c2';
 
-    // Обновляем метки
     chart.data.labels.shift();
     chart.data.labels.push('');
-
     lastPulseTime = Date.now();
     chart.update();
 }, 2000);
