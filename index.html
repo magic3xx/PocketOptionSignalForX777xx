@@ -1,797 +1,103 @@
-:root {
-    --primary: #6c5ce7;
-    --primary-dark: #5649c0;
-    --success: #00b894;
-    --success-dark: #00a884;
-    --danger: #d63031;
-    --danger-dark: #c02a2a;
-    --dark: #2d3436;
-    --light: #f5f6fa;
-    --gray: #636e72;
-    --light-gray: #dfe6e9;
-    --blur-bg: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
-}
-
-/* Базовые стили */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html {
-    font-size: 16px;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-    color: var(--light);
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    min-height: 100vh;
-    overflow-x: hidden;
-    line-height: 1.5;
-    width: 100%;
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Binary Signals Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="blur-background"></div>
     
-}
-
-/* Адаптивные контейнеры */
-.container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1.5rem;
-}
-
-
-#chart-container {
-    position: relative;
-    width: 100%;
-    height: 400px;
-    
-    background-size: cover;
-    background-position: center;
-}
-
-canvas#price-chart {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-#price-chart {
-    position: relative;
-    z-index: 2;
-    background-color: rgba(0, 0, 0, 0.3); /* Полупрозрачный фон */
-}
-
-.chart-mountains {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    opacity: 0.5;
-}
-
-.get-signal-btn, .expiry-btn {
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.get-signal-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-/* Фон с размытием */
-.blur-background {
-    position: fixed;
-    top: -100px;
-    left: -100px;
-    right: -100px;
-    bottom: -100px;
-    z-index: -1;
-    background:
-        radial-gradient(circle at 20% 30%, rgba(255, 255, 0, 0.7) 0%, transparent 100%),
-        radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.7) 0%, transparent 100%),
-        radial-gradient(circle at 50% 70%, rgba(255, 0, 100, 0.8) 0%, transparent 45%),
-        radial-gradient(circle at 30% 50%, rgba(255, 0, 255, 0.8) 0%, transparent 45%),
-        radial-gradient(circle at 70% 60%, rgba(0, 150, 255, 0.9) 0%, transparent 45%),
-        radial-gradient(circle at 10% 80%, rgba(50, 255, 50, 0.7) 0%, transparent 40%),
-        radial-gradient(circle at 90% 70%, rgba(255, 100, 255, 0.8) 0%, transparent 45%),
-        linear-gradient(45deg, 
-            rgba(255, 0, 0, 0.3) 0%, 
-            rgba(0, 255, 0, 0.3) 50%, 
-            rgba(0, 0, 255, 0.3) 100%);
-    backdrop-filter: blur(30px) saturate(200%) contrast(150%);
-    -webkit-backdrop-filter: blur(30px) saturate(200%) contrast(150%);
-    animation: 
-        neonFlow 20s linear infinite,
-        pulse 5s ease-in-out infinite alternate;
-    background-size: 300% 300%;
-    opacity: 0.95;
-}
-
-@keyframes neonFlow {
-    0% { background-position: 0% 0%; }
-    50% { background-position: 100% 100%; }
-    100% { background-position: 0% 0%; }
-}
-
-@keyframes pulse {
-    0% { opacity: 0.9; transform: scale(1); }
-    100% { opacity: 1; transform: scale(1.05); }
-}
-
-
-
-
-@supports (backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px)) {
-    .blur-background {
-        background: linear-gradient(45deg, 
-            rgba(108, 92, 231, 0.15) 0%, 
-            rgba(0, 184, 148, 0.15) 50%, 
-            rgba(214, 48, 49, 0.15) 100%);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-    }
-}
-
-@keyframes gradientShift {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-@supports (backdrop-filter: blur(10px)) {
-    .blur-background {
-        background: rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(8px);
-    }
-}
-
-/* Шапка */
-.header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding: 1.2rem;
-    background: var(--blur-bg);
-    backdrop-filter: blur(10px);
-    border-radius: 0.75rem;
-    border: 1px solid var(--glass-border);
-}
-
-.logo {
-    font-weight: 700;
-    font-size: clamp(1.5rem, 5vw, 2rem);
-    color: var(--light);
-    text-align: center;
-}
-
-.logo span {
-    color: var(--primary);
-}
-
-.current-time {
-    font-size: 1rem;
-    font-weight: 600;
-    background: rgba(0, 0, 0, 0.3);
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-}
-
-/* Панель управления */
-.control-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    margin-bottom: 1.5rem;
-    padding: 1.2rem;
-    background: var(--blur-bg);
-    backdrop-filter: blur(10px);
-    border-radius: 0.75rem;
-    border: 1px solid var(--glass-border);
-}
-
-.control-group {
-    width: 100%;
-}
-
-.control-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    font-size: 0.9rem;
-    color: var(--light-gray);
-}
-
-.select-box {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--glass-border);
-    border-radius: 0.5rem;
-    color: var(--light);
-    font-size: 1rem;
-    outline: none;
-    transition: all 0.3s ease;
-}
-
-.select-box:focus {
-    border-color: var(--primary);
-}
-
-.expiry-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem;
-}
-
-.expiry-btn {
-    flex: 1 0 auto;
-    min-width: 2.5rem;
-    padding: 0.4rem 0.1rem; 
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--glass-border);
-    border-radius: 0.4rem;
-    color: var(--light);
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-}
-
-.expiry-btn:hover {
-    background: rgba(108, 92, 231, 0.2);
-}
-
-.expiry-btn.active {
-    background: var(--primary);
-    border-color: var(--primary);
-}
-
-/* График */
-.chart-container {
-    height: 300px;
-    margin-bottom: 15px;
-    background: var(--blur-bg);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
-    border: 1px solid var(--glass-border);
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-    border-radius: 12px;
-}
-
-.chart-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 0;
-    pointer-events: none;
-     /* 💡 размытие и затемнение */
-}
-
-#price-chart {
-    width: 100%;
-    height: 100%;
-    padding: 10px;
-}
-
-@media (max-width: 768px) {
-    .chart-container {
-        height: 250px; /* Ещё меньше для маленьких экранов */
-        border-radius: 8px; /* Меньшие скругления */
-    }
-    
-    #price-chart {
-        padding: 5px; /* Уменьшаем отступы */
-    }
-}
-
-/* Инструкции */
-.instructions {
-    background: var(--blur-bg);
-    backdrop-filter: blur(10px);
-    border-radius: 0.75rem;
-    border: 1px solid var(--glass-border);
-    padding: 1.2rem;
-    margin-bottom: 1.5rem;
-}
-
-.instructions h3 {
-    margin-bottom: 0.8rem;
-    color: var(--primary);
-    font-size: 1.1rem;
-}
-
-.instructions ol {
-    padding-left: 1.2rem;
-    color: var(--light-gray);
-}
-
-.instructions li {
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
-/* Управление сигналами */
-.signal-control {
-    margin-bottom: 1.5rem;
-}
-
-.get-signal-btn {
-    width: 100%;
-    padding: 0.8rem;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.get-signal-btn:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-}
-
-/* Анимация анализа */
-.analyzing-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    background: var(--blur-bg);
-    backdrop-filter: blur(10px);
-    border-radius: 0.75rem;
-    border: 1px solid var(--glass-border);
-    animation: fadeIn 0.5s ease-out;
-}
-
-.analyzing-loader {
-    width: 3rem;
-    height: 3rem;
-    border: 0.25rem solid rgba(108, 92, 231, 0.2);
-    border-radius: 50%;
-    border-top-color: var(--primary);
-    animation: spin 1s linear infinite;
-    margin-bottom: 1.2rem;
-}
-
-.analyzing-text {
-    font-size: 1.1rem;
-    color: var(--light);
-    font-weight: 500;
-}
-
-/* Результат сигнала */
-.signal-result {
-    animation: fadeIn 0.5s ease-out;
-}
-
-.signal-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 0.8rem;
-    margin-bottom: 0.8rem;
-}
-
-.signal-card {
-    background-color: transparent;
-    backdrop-filter: blur(10px);
-    border-radius: 0.6rem;
-    border: 1px solid var(--glass-border);
-    padding: 1.5rem;
-    text-align: center;
-    font-size: 1.1rem;
-    line-height: 1.6;
-}
-
-.text-light {
-    font-weight: 400;
-    color: var(--light-gray); /* Серый цвет из ваших переменных */
-}
-
-.text-bold {
-    font-weight: 700;
-    color: var(--light); /* Белый цвет из ваших переменных */
-}
-
-@media (max-width: 576px) {
-    .signal-card {
-        font-size: 1rem;
-        padding: 1rem;
-    }
-}
-.signal-card-title {
-    font-size: 0.8rem;
-    color: var(--light-gray);
-    margin-bottom: 0.6rem;
-}
-
-.signal-message p {
-    margin-bottom: 0.8rem;
-}
-
-
-.signal-message strong {
-    font-weight: 700;
-    color: var(--primary);
-}
-
-@media (max-width: 576px) {
-    .signal-card {
-        font-size: 1rem;
-        padding: 1rem;
-    }
-}
-
-.chartjs-scale-y, 
-.chartjs-scale-x,
-.chartjs-tooltip,
-.chartjs-tooltip-key {
-    display: none !important;
-}
-
-.signal-card-value {
-    font-size: 1.4em;
-    font-weight: bold;
-    margin: 10px 0;
-    line-height: 1.4;
-}
-
-.signal-card-desc {
-    font-size: 1em;
-    color: #aaa;
-    line-height: 1.4;
-}
-
-.signal-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #1c87c2;
-}
-
-.robot-icon {
-    font-size: 24px;
-}
-
-.signal-stats {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.percent-value {
-    font-size: 32px;
-    font-weight: bold;
-    color: #fff;
-}
-
-.percent-label {
-    font-size: 32px;
-    font-weight: bold;
-    color: #fff;
-}
-
-.direction-arrow {
-    font-size: 28px;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-}
-
-.direction-arrow.up {
-    color: #00b894;
-    background: rgba(0, 184, 148, 0.1);
-}
-
-.direction-arrow.down {
-    color: #d63031;
-    background: rgba(214, 48, 49, 0.1);
-}
-
-.signal-time {
-    background: rgba(28, 135, 194, 0.1);
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 16px;
-    text-align: center;
-    margin-top: 10px;
-}
-
-/* Направление сигнала */
-.final-direction {
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 1rem;
-    flex-direction: column;
-}
-
-.final-direction.up {
-    background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
-}
-
-.final-direction.down {
-    background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%);
-}
-
-.direction-text {
-    font-size: clamp(1.2rem, 5vw, 1.8rem);
-    font-weight: 700;
-    text-transform: uppercase;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.direction-symbol {
-    font-size: 1.5em;
-    margin-right: 10px;
-}
-
-.direction-icon i {
-    margin-top: 10px;
-    font-size: clamp(1.8rem, 6vw, 3rem);
-}
-
-/* Анимации */
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.hidden {
-    display: none !important;
-}
-
-@media (max-width: 576px) {
-    .header {
-        flex-direction: column;
-        gap: 0.5rem;
-        padding: 0.8rem;
-    }
-    
-    .current-time {
-        font-size: 0.9rem;
-        padding: 0.3rem 0.8rem;
-    }
-}
-
-/* Медиа-запросы для адаптации */
-@media (min-width: 576px) {
-    .header {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .control-panel {
-        flex-direction: row;
-    }
-    
-    .control-group {
-        flex: 1;
-    }
-    
-    .expiry-btn {
-        padding: 0.5rem;
-    }
-}
-
-@media (min-width: 768px) {
-    .container {
-        padding: 2rem;
-    }
-    
-    .chart-container {
-        height: 50vh;
-    }
-    
-    .signal-grid {
-        gap: 1rem;
-    }
-}
-
-@media (min-width: 992px) {
-    html {
-        font-size: 18px;
-    }
-    
-    .container {
-        max-width: 1400px;
-    }
-}
-
-@media (max-width: 576px) {
-    .signal-grid {
-        grid-template-columns: 1fr; /* Одна колонка */
-        gap: 0.5rem;
-    }
-    
-    .signal-card {
-        padding: 0.8rem;
-    }
-    
-    .signal-card-value {
-        font-size: 1.2rem;
-    }
-}
-
-.select-wrapper {
-    position: relative;
-    width: 100%;
-}
-
-.select-box {
-    width: 100%;
-    padding: 0.8rem 2.5rem 0.8rem 1rem;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--glass-border);
-    border-radius: 0.5rem;
-    color: var(--light);
-    font-size: 1rem;
-    outline: none;
-    transition: all 0.3s ease;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    cursor: pointer;
-}
-
-.select-box:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.3);
-}
-
-canvas {
-    position: relative;
-}
-
-.pulsing-dot {
-    position: absolute;
-    width: 14px;
-    height: 14px;
-    background: #6c5ce7;
-    border-radius: 50%;
-    animation: pulse 1s infinite;
-    pointer-events: none;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-        opacity: 0.9;
-    }
-    50% {
-        transform: scale(1.5);
-        opacity: 0.3;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 0.9;
-    }
-}
-
-.select-wrapper::after {
-    content: "▼";
-    position: absolute;
-    top: 50%;
-    right: 1rem;
-    transform: translateY(-50%);
-    color: var(--light-gray);
-    font-size: 0.7rem;
-    pointer-events: none;
-    transition: transform 0.3s ease;
-}
-
-.select-wrapper:focus-within::after {
-    transform: translateY(-50%) rotate(180deg);
-    color: var(--primary);
-}
-
-/* Стили для options */
-.select-box option {
-    background: #2d3436;
-    color: var(--light);
-    padding: 0.5rem;
-}
-
-.select-box option:hover {
-    background: var(--primary);
-}
-
-/* Анимация при открытии */
-@keyframes fadeInDropdown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.select-box:focus {
-    animation: fadeInDropdown 0.3s ease-out;
-}
-
-/* Эффекты при наведении */
-.select-box:hover {
-    border-color: rgba(108, 92, 231, 0.5);
-}
-
-/* Стиль для выбранного option */
-.select-box option:checked {
-    background-color: var(--primary-dark);
-    color: white;
-}
-
-/* Кастомизация скроллбара в выпадающем списке */
-.select-box::-webkit-scrollbar {
-    width: 8px;
-}
-
-.select-box::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-}
-
-.select-box::-webkit-scrollbar-thumb {
-    background-color: var(--primary);
-    border-radius: 4px;
-}
-
-/* Для Firefox */
-.select-box {
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary) rgba(0, 0, 0, 0.1);
-}
-
-@media (max-width: 768px) {
-    .select-box {
-        font-size: 0.9rem; /* Уменьшаем шрифт */
-        padding: 0.7rem 1.5rem 0.7rem 0.8rem; /* Уменьшаем отступы */
-    }
-    
-    .select-wrapper::after {
-        right: 0.8rem;
-        font-size: 0.6rem;
-    }
-}
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">BINARY<span>SIGNALS</span></h1>
+            <div class="current-time" id="current-time">00:00:00</div>
+        </header>
+
+        <main class="main-content">
+            <div class="control-panel">
+                <div class="control-group">
+                    <label for="asset-select">Актив:</label>
+                    <div class="select-wrapper">
+                        <select id="asset-select" class="select-box">
+                            <option value="EUR/USD">EUR/USD</option>
+                            <option value="GBP/USD">GBP/USD</option>
+                            <option value="USD/JPY">USD/JPY</option>
+                            <option value="BTC/USD">BTC/USD</option>
+                            <option value="ETH/USD">ETH/USD</option>
+                            <option value="Gold">Gold</option>
+                            <option value="Oil">Oil</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label>Экспирация:</label>
+                    <div class="expiry-buttons">
+                        <button class="expiry-btn" data-time="15">15с</button>
+                        <button class="expiry-btn" data-time="30">30с</button>
+                        <button class="expiry-btn active" data-time="60">1м</button>
+                        <button class="expiry-btn" data-time="180">3м</button>
+                        <button class="expiry-btn" data-time="300">5м</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <img src="imgs/dark-blue.jpg" alt="Mountains" class="chart-bg">
+                <canvas id="price-chart"></canvas>
+            </div>
+
+            <div class="instructions" id="instr">
+                <h3>Как пользоваться:</h3>
+                <ol>
+                    <li>Выберите валютную пару</li>
+                    <li>Установите время экспирации</li>
+                    <li>Нажмите "Получить сигнал"</li>
+                    <li>Следуйте рекомендациям</li>
+                </ol>
+            </div>
+
+            <div class="signal-control">
+                <button class="get-signal-btn" id="get-signal-btn">
+                    <span>Получить сигнал</span>
+                </button>
+                
+                <div class="analyzing-container hidden" id="analyzing-container">
+                    <div class="analyzing-loader"></div>
+                    <div class="analyzing-text">Анализируем график...</div>
+                </div>
+            </div>
+
+            <div class="signal-result hidden" id="signal-result">
+                    <div class="signal-grid">
+                        <div class="signal-card">
+                            <div class="signal-card-title"></div>
+                            <div class="signal-card-value" id="traders-percent">75%</div>
+                            <div class="signal-card-desc" id="traders-direction">в повышение</div>
+                        </div>
+                        
+                        <div class="signal-card">
+                            <div class="signal-card-title"></div>
+                            <div class="signal-card-desc" id="expiry-time">До входа в сделку</div>
+                            <div class="signal-card-value" id="time-left">00:15</div>
+                        </div>
+                    </div>
+                    
+                    <div class="final-direction" id="final-direction">
+                        <div class="direction-text" id="direction-text">ПОВЫШЕНИЕ</div>
+
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                    </div>
+                </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
