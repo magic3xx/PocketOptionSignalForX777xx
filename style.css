@@ -401,6 +401,19 @@ canvas#price-chart {
     margin-bottom: 0.8rem;
 }
 
+.asset-category {
+            margin-bottom: 10px;
+            display: none;
+        }
+        
+        .asset-category.active {
+            display: block;
+        }
+        
+        .category-selector {
+            margin-bottom: 10px;
+        }
+
 .signal-card {
     background-color: transparent;
     backdrop-filter: blur(10px);
