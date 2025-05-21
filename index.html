@@ -20,16 +20,23 @@
         <main class="main-content">
             <div class="control-panel">
                 <div class="control-group">
+                    <label for="category-select">Категория:</label>
+                    <div class="select-wrapper">
+                        <select id="category-select" class="select-box">
+                            <option value="">Выберите категорию</option>
+                            <option value="currencies">Валюты</option>
+                            <option value="crypto">Криптовалюты</option>
+                            <option value="stocks">Акции</option>
+                            <option value="commodities">Сырьевые товары</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="control-group">
                     <label for="asset-select">Актив:</label>
                     <div class="select-wrapper">
-                        <select id="asset-select" class="select-box">
-                            <option value="EUR/USD">EUR/USD</option>
-                            <option value="GBP/USD">GBP/USD</option>
-                            <option value="USD/JPY">USD/JPY</option>
-                            <option value="BTC/USD">BTC/USD</option>
-                            <option value="ETH/USD">ETH/USD</option>
-                            <option value="Gold">Gold</option>
-                            <option value="Oil">Oil</option>
+                        <select id="asset-select" class="select-box" disabled>
+                            <option value="">Сначала выберите категорию</option>
                         </select>
                     </div>
                 </div>
@@ -89,11 +96,10 @@
                     
                     <div class="final-direction" id="final-direction">
                         <div class="direction-text" id="direction-text">ПОВЫШЕНИЕ</div>
-
-                            <i class="fas fa-arrow-up"></i>
-                        </div>
+                        <i class="fas fa-arrow-up"></i>
                     </div>
                 </div>
+            </div>
         </main>
     </div>
 
