@@ -348,3 +348,107 @@ function generateSignal() {
     chart.update();
 }, 2000);
 });
+
+ document.addEventListener('DOMContentLoaded', function() {
+            const categorySelect = document.getElementById('category-select');
+            const assetSelect = document.getElementById('asset-select');
+            
+            // Данные для выпадающих списков
+            const assets = {
+                currencies: [
+                    {value: "AUD/CAD OTC", text: "AUD/CAD OTC"},
+                    {value: "AUD/NZD OTC", text: "AUD/NZD OTC"},
+                    {value: "BHD/CNY OTC", text: "BHD/CNY OTC"},
+                    {value: "CAD/CHF OTC", text: "CAD/CHF OTC"},
+                    {value: "CAD/JPY OTC", text: "CAD/JPY OTC"},
+                    {value: "CHF/JPY OTC", text: "CHF/JPY OTC"},
+                    {value: "EUR/JPY OTC", text: "EUR/JPY OTC"},
+                    {value: "EUR/RUB OTC", text: "EUR/RUB OTC"},
+                    {value: "GBP/USD OTC", text: "GBP/USD OTC"},
+                    {value: "KES/USD OTC", text: "KES/USD OTC"},
+                    {value: "LBP/USD OTC", text: "LBP/USD OTC"},
+                    {value: "NZD/JPY OTC", text: "NZD/JPY OTC"},
+                    {value: "USD/IDR OTC", text: "USD/IDR OTC"},
+                    {value: "USD/EGP OTC", text: "USD/EGP OTC"},
+                    {value: "USD/COP OTC", text: "USD/COP OTC"},
+                    {value: "USD/CLP OTC", text: "USD/CLP OTC"},
+                    {value: "USD/BDT OTC", text: "USD/BDT OTC"},
+                    {value: "USD/ARS OTC", text: "USD/ARS OTC"},
+                    {value: "QAR/CNY OTC", text: "QAR/CNY OTC"},
+                    {value: "OMR/CNY OTC", text: "OMR/CNY OTC"},
+                    {value: "USD/MXN OTC", text: "USD/MXN OTC"},
+                    {value: "USD/MYR OTC", text: "USD/MYR OTC"},
+                    {value: "USD/PHP OTC", text: "USD/PHP OTC"},
+                    {value: "USD/RUB OTC", text: "USD/RUB OTC"},
+                    {value: "CAD/CHF OTC", text: "CAD/CHF OTC"},
+                    {value: "CHF/NOK OTC", text: "CHF/NOK OTC"},
+                    {value: "EUR/USD OTC", text: "EUR/USD OTC"},
+                    {value: "AED/CNY OTC", text: "AED/CNY OTC"},
+                    {value: "GBP/AUD OTC", text: "GBP/AUD OTC"},
+                    {value: "USD/ARS OTC", text: "USD/ARS OTC"},
+                    {value: "JOD/CNY OTC", text: "JOD/CNY OTC"},
+                    {value: "YER/USD OTC", text: "YER/USD OTC"}
+                ],
+                crypto: [
+                    {value: "Cardano OTC", text: "Cardano OTC"},
+                    {value: "BNB OTC", text: "BNB OTC"},
+                    {value: "Bitcoin OTC", text: "Bitcoin OTC"},
+                    {value: "Dogecoin OTC", text: "Dogecoin OTC"},
+                    {value: "Polkadot OTC", text: "Polkadot OTC"},
+                    {value: "Ethereum OTC", text: "Ethereum OTC"},
+                    {value: "Solana OTC", text: "Solana OTC"}
+                ],
+                commodities: [
+                    {value: "Brent Oil OTC", text: "Brent Oil OTC"},
+                    {value: "WTI Crude Oil OTC", text: "WTI Crude Oil OTC"},
+                    {value: "Silver OTC", text: "Silver OTC"},
+                    {value: "Gold OTC", text: "Gold OTC"},
+                    {value: "Natural Gas OTC", text: "Natural Gas OTC"},
+                    {value: "Palladium spot OTC", text: "Palladium spot OTC"},
+                    {value: "Platinum spot OTC", text: "Platinum spot OTC"}
+                ],
+                stocks: [
+                    {value: "McDonald's OTC", text: "McDonald's OTC"},
+                    {value: "Tesla OTC", text: "Tesla OTC"},
+                    {value: "Amazon OTC", text: "Amazon OTC"},
+                    {value: "Coinbase Global OTC", text: "Coinbase Global OTC"},
+                    {value: "VISA OTC", text: "VISA OTC"},
+                    {value: "Alibaba OTC", text: "Alibaba OTC"},
+                    {value: "Netflix OTC", text: "Netflix OTC"}
+                ]
+            };
+            
+            // Обработчик изменения категории
+            categorySelect.addEventListener('change', function() {
+                const selectedCategory = this.value;
+                
+                // Очищаем список активов
+                assetSelect.innerHTML = '<option value="">Выберите актив</option>';
+                
+                if (selectedCategory) {
+                    // Активируем выбор актива
+                    assetSelect.disabled = false;
+                    
+                    // Заполняем список активов в зависимости от выбранной категории
+                    assets[selectedCategory].forEach(asset => {
+                        const option = document.createElement('option');
+                        option.value = asset.value;
+                        option.textContent = asset.text;
+                        assetSelect.appendChild(option);
+                    });
+                } else {
+                    // Деактивируем выбор актива, если категория не выбрана
+                    assetSelect.disabled = true;
+                }
+            });
+            
+            // Обновление времени
+            function updateTime() {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString();
+                document.getElementById('current-time').textContent = timeStr;
+            }
+            
+            setInterval(updateTime, 1000);
+            updateTime();
+        });
