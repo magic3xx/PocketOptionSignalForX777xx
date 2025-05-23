@@ -257,9 +257,10 @@ function generateSignal() {
     const activeExpiryBtn = document.querySelector('.expiry-btn.active');
     const expiryTime = parseInt(activeExpiryBtn.dataset.time);
     const timeLeftElement = document.getElementById('time-left');
-    let remaining = expiryTime;
+    
+    // Фиксированные 15 секунд на подготовку
+    let remaining = 15; // Было expiryTime, стало 15
 
-    // Первый этап - ожидание входа в сделку
     document.getElementById('expiry-time').textContent = `До входа в сделку:`;
     updateTimeDisplay();
 
@@ -269,10 +270,10 @@ function generateSignal() {
         
         if (remaining <= 0) {
             clearInterval(countdown);
-            isInTrade = true; // Теперь можно применять направление графика
+            isInTrade = true;
             
-            // Второй этап - время самой сделки
-            let dealRemaining = expiryTime;
+            // Вторая часть остается с оригинальным expiryTime
+            let dealRemaining = expiryTime; 
             document.getElementById('expiry-time').textContent = `До окончания сделки:`;
             
             const dealCountdown = setInterval(() => {
@@ -283,14 +284,15 @@ function generateSignal() {
                 
                 if (dealRemaining <= 0) {
                     clearInterval(dealCountdown);
-                    signalTrend = 0; // Возвращаем нейтральное направление
+                    signalTrend = 0;
                     isInTrade = false;
                     setTimeout(() => {
                         signalResult.classList.add('hidden');
                         getSignalBtn.classList.remove('hidden');
                         instrElement.innerHTML = originalHtml;
                         instrElement.style.display = 'block';
-                        document.getElementById('expiry-time').textContent = `через ${expiryTime} сек`;
+                        // Возвращаем оригинальное время для следующего запуска
+                        document.getElementById('expiry-time').textContent = `через ${expiryTime} сек`; 
                     }, 500);
                 }
             }, 1000);
@@ -352,6 +354,9 @@ function generateSignal() {
  document.addEventListener('DOMContentLoaded', function() {
             const categorySelect = document.getElementById('category-select');
             const assetSelect = document.getElementById('asset-select');
+            const getSignalBtn = document.getElementById('get-signal-btn');
+
+
             
             // Данные для выпадающих списков
             const assets = {
@@ -417,6 +422,15 @@ function generateSignal() {
                     {value: "Netflix OTC", text: "Netflix OTC"}
                 ]
             };
+
+            getSignalBtn.disabled = true;
+
+            assetSelect.addEventListener('change', function() {
+        getSignalBtn.disabled = this.value === '';
+        getSignalBtn.classList.remove('hidden');
+        analyzingContainer.classList.add('hidden');
+        signalResult.classList.add('hidden');
+    });
             
             // Обработчик изменения категории
             categorySelect.addEventListener('change', function() {
