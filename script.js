@@ -227,8 +227,8 @@ function generateSignal() {
     const expiryTimeString = now.toLocaleTimeString('ru-RU', { hour12: false });
 
     // Формируем направление
-    const direction = isUp ? 'increase' : 'decrease';
-    const directionText = isUp ? 'INCREASE' : 'DECREASE';
+    const direction = isUp ? 'buy' : 'sell';
+    const directionText = isUp ? 'BUY' : 'SELL';
 
     // Создаем HTML для сигнала
     const signalHTML = `
