@@ -257,9 +257,21 @@ function generateSignal() {
     const activeExpiryBtn = document.querySelector('.expiry-btn.active');
     const expiryTime = parseInt(activeExpiryBtn.dataset.time);
     const timeLeftElement = document.getElementById('time-left');
-    
-    // Фиксированные 15 секунд на подготовку
-    let remaining = 15; // Было expiryTime, стало 15
+
+    // --- START OF CHANGES ---
+
+    // Calculate the number of seconds remaining until the next full minute.
+    const now = new Date();
+    const seconds = now.getSeconds();
+    let remaining = 60 - seconds;
+
+    // This handles the edge case where the button is clicked at exactly :00 seconds.
+    // Instead of waiting 60 seconds, we start the trade countdown immediately.
+    if (remaining === 60) {
+        remaining = 0;
+    }
+
+    // --- END OF CHANGES ---
 
     document.getElementById('expiry-time').textContent = `Before entering a trade:`;
     updateTimeDisplay();
@@ -272,7 +284,7 @@ function generateSignal() {
             clearInterval(countdown);
             isInTrade = true;
             
-            // Вторая часть остается с оригинальным expiryTime
+            // The rest of your logic for the trade itself remains the same.
             let dealRemaining = expiryTime; 
             document.getElementById('expiry-time').textContent = `Before the end of the transaction:`;
             
@@ -291,8 +303,8 @@ function generateSignal() {
                         getSignalBtn.classList.remove('hidden');
                         instrElement.innerHTML = originalHtml;
                         instrElement.style.display = 'block';
-                        // Возвращаем оригинальное время для следующего запуска
-                        document.getElementById('expiry-time').textContent = `через ${expiryTime} сек`; 
+                        // Reset the text for the next signal
+                        document.querySelector('.signal-card').innerHTML = originalSignalCardHTML;
                     }, 500);
                 }
             }, 1000);
