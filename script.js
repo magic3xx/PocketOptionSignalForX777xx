@@ -227,14 +227,14 @@ function generateSignal() {
     const expiryTimeString = now.toLocaleTimeString('ru-RU', { hour12: false });
 
     // Формируем направление
-    const direction = isUp ? 'повышение' : 'понижение';
-    const directionText = isUp ? 'ПОВЫШЕНИЕ' : 'ПОНИЖЕНИЕ';
+    const direction = isUp ? 'increase' : 'decrease';
+    const directionText = isUp ? 'INCREASE' : 'DECREASE';
 
     // Создаем HTML для сигнала
     const signalHTML = `
         <div class="signal-message">
-            <p><span class="text-bold">${percent}</span>% лучших трейдеров сделали ставку на </span><span class="text-bold">${direction}</span><span class="text-light">.</span></p>
-            <p><span class="text-light">Ровно в </span><span class="text-bold">${expiryTimeString}</span><span class="text-light"> ставим </span><span class="text-bold">${direction}</span><span class="text-light">!</span></p>
+            <p><span class="text-bold">${percent}</span>% of the best traders bet on </span><span class="text-bold">${direction}</span><span class="text-light">.</span></p>
+            <p><span class="text-light">Exactly at </span><span class="text-bold">${expiryTimeString}</span><span class="text-light"> we bet </span><span class="text-bold">${direction}</span><span class="text-light">!</span></p>
         </div>
     `;
 
@@ -261,7 +261,7 @@ function generateSignal() {
     // Фиксированные 15 секунд на подготовку
     let remaining = 15; // Было expiryTime, стало 15
 
-    document.getElementById('expiry-time').textContent = `До входа в сделку:`;
+    document.getElementById('expiry-time').textContent = `Before entering a trade:`;
     updateTimeDisplay();
 
     const countdown = setInterval(() => {
@@ -274,12 +274,12 @@ function generateSignal() {
             
             // Вторая часть остается с оригинальным expiryTime
             let dealRemaining = expiryTime; 
-            document.getElementById('expiry-time').textContent = `До окончания сделки:`;
+            document.getElementById('expiry-time').textContent = `Before the end of the transaction:`;
             
             const dealCountdown = setInterval(() => {
                 dealRemaining--;
                 
-                document.getElementById('expiry-time').textContent = `До окончания сделки:`;
+                document.getElementById('expiry-time').textContent = `Before the end of the transaction:`;
                 updateDealTimeDisplay(dealRemaining);
                 
                 if (dealRemaining <= 0) {
@@ -437,7 +437,7 @@ function generateSignal() {
                 const selectedCategory = this.value;
                 
                 // Очищаем список активов
-                assetSelect.innerHTML = '<option value="">Выберите актив</option>';
+                assetSelect.innerHTML = '<option value="">Select asset</option>';
                 
                 if (selectedCategory) {
                     // Активируем выбор актива
