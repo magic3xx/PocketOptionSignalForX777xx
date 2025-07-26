@@ -86,7 +86,6 @@ document.addEventListener('DOMContentLoaded', function () {
     Chart.register({
         id: 'uniformVerticalGrid',
         beforeDraw(chart) {
-            // Код для вертикальной сетки (как было)
             const ctx = chart.ctx;
             const xAxis = chart.scales.x;
             const chartArea = chart.chartArea;
@@ -131,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const point = meta.data[realLength - 1];
             if (!point || typeof point.x !== 'number' || typeof point.y !== 'number') return;
 
-            // Горизонтальная линия (оставляем как было)
+            // Горизонтальная линия
             ctx.save();
             ctx.beginPath();
             ctx.moveTo(chart.chartArea.left, point.y);
@@ -141,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
             ctx.stroke();
             ctx.restore();
 
-            // Статичный шарик (оставляем как было)
+            // Статичный шарик
             ctx.save();
             ctx.beginPath();
             ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
@@ -153,20 +152,18 @@ document.addEventListener('DOMContentLoaded', function () {
             const now = Date.now();
             if (now - lastPulseTime < 1000) {
                 const progress = (now - lastPulseTime) / 1000;
-                const outerRadius = 15 + progress * 50; // Больший радиус
-                const innerRadius = 10 + progress * 30; // Внутренний радиус
+                const outerRadius = 15 + progress * 50;
+                const innerRadius = 10 + progress * 30;
 
-                // Создаем градиент с прозрачной серединой
                 const gradient = ctx.createRadialGradient(
                     point.x, point.y, innerRadius,
                     point.x, point.y, outerRadius
                 );
 
-                // Голубые края с прозрачностью
-                gradient.addColorStop(0, 'rgba(100, 149, 237, 0)');       // Прозрачный центр
-                gradient.addColorStop(0.3, 'rgba(100, 149, 237, 0.3)');   // Начало цвета
-                gradient.addColorStop(0.7, 'rgba(100, 149, 237, 0.3)');   // Пик цвета
-                gradient.addColorStop(1, 'rgba(100, 149, 237, 0)');       // Прозрачный край
+                gradient.addColorStop(0, 'rgba(100, 149, 237, 0)');
+                gradient.addColorStop(0.3, 'rgba(100, 149, 237, 0.3)');
+                gradient.addColorStop(0.7, 'rgba(100, 149, 237, 0.3)');
+                gradient.addColorStop(1, 'rgba(100, 149, 237, 0)');
             }
         }
     });
@@ -189,9 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const getSignalBtn = document.getElementById('get-signal-btn');
     const analyzingContainer = document.getElementById('analyzing-container');
     const signalResult = document.getElementById('signal-result');
-    // Получаем элемент с инструкциями
     const instrElement = document.getElementById('instr');
-    // Сохраняем оригинальный HTML
     const originalHtml = instrElement.innerHTML;
 
     getSignalBtn.addEventListener('click', function () {
@@ -207,56 +202,45 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 3000);
     });
 
-    let isFirstExpiryCompleted = false;
-
-    // Глобальные переменные
     let isInTrade = false;
 
-    // ======================================================================
-    // ===== THE UPDATED FUNCTION IS HERE =====
-    // ======================================================================
     function generateSignal() {
-        // --- START OF IMPROVEMENT ---
-
-        // 1. Get the chart data to analyze the trend
-        const data = chart.data.datasets[0].data;
-        const lastPoint = data[realLength - 1];
-        // Look at a point 15 steps ago to determine the trend
-        const pastPoint = data[realLength - 1 - 15]; 
-
-        // 2. Determine the trend direction and set probability
-        const trend = lastPoint - pastPoint;
-        const trendFollowingProbability = 0.80; // 80% chance to follow the trend
-        let isUp;
-
-        if (trend > 0) {
-            // Trend is UP, so we're more likely to generate a BUY signal
-            isUp = Math.random() < trendFollowingProbability; // e.g., 80% chance to be true
-        } else if (trend < 0) {
-            // Trend is DOWN, so we're more likely to generate a SELL signal
-            isUp = Math.random() > trendFollowingProbability; // e.g., 20% chance to be true (isUp)
-        } else {
-            // No clear trend, fall back to 50/50
-            isUp = Math.random() > 0.5;
-        }
-
-        // --- END OF IMPROVEMENT ---
-
-        // The rest of your function remains the same
         const activeExpiryBtn = document.querySelector('.expiry-btn.active');
         const expiryTime = parseInt(activeExpiryBtn.dataset.time);
         const percent = Math.floor(Math.random() * 20) + 73;
 
-        // Рассчитываем время окончания экспирации
+        // --- START OF IMPROVEMENT ---
+
+        // 1. Get the chart's data
+        const chartData = chart.data.datasets[0].data;
+
+        // 2. Determine the recent momentum
+        // We compare the last point with a point 5 steps before it.
+        const lastValue = chartData[realLength - 1];
+        const previousValue = chartData[realLength - 6]; // 5 steps ago
+        
+        let momentumIsUp = lastValue > previousValue;
+
+        // If there's no clear momentum, fall back to a 50/50 chance
+        if (lastValue === previousValue) {
+            momentumIsUp = Math.random() > 0.5;
+        }
+
+        // 3. Generate a biased signal based on momentum
+        // 80% chance to follow the trend, 20% chance to go against it.
+        const isUp = Math.random() < 0.80 ? momentumIsUp : !momentumIsUp;
+        
+        // --- END OF IMPROVEMENT ---
+
+
+        // The rest of the function remains the same
         const now = new Date();
         now.setSeconds(now.getSeconds() + expiryTime);
         const expiryTimeString = now.toLocaleTimeString('ru-RU', { hour12: false });
 
-        // Формируем направление
         const direction = isUp ? 'buy' : 'sell';
         const directionText = isUp ? 'BUY' : 'SELL';
 
-        // Создаем HTML для сигнала
         const signalHTML = `
             <div class="signal-message">
                 <p><span class="text-bold">${percent}</span>% of the best traders bet on </span><span class="text-bold">${direction}</span><span class="text-light">.</span></p>
@@ -264,16 +248,13 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         `;
 
-        // Вставляем сформированный HTML
         document.querySelector('.signal-card').innerHTML = signalHTML;
 
-        // Настройка блока направления
         const directionBlock = document.getElementById('final-direction');
         directionBlock.className = `final-direction ${isUp ? 'up' : 'down'}`;
         document.getElementById('direction-text').textContent = directionText;
         directionBlock.querySelector('i').className = isUp ? 'fas fa-arrow-up' : 'fas fa-arrow-down';
 
-        // Запоминаем направление, но пока не применяем
         signalTrend = isUp ? 1 : -1;
         isInTrade = false;
         signalResult.classList.remove('hidden');
@@ -284,12 +265,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const expiryTime = parseInt(activeExpiryBtn.dataset.time);
         const timeLeftElement = document.getElementById('time-left');
 
-        // Calculate the number of seconds remaining until the next full minute.
         const now = new Date();
         const seconds = now.getSeconds();
         let remaining = 60 - seconds;
 
-        // This handles the edge case where the button is clicked at exactly :00 seconds.
         if (remaining === 60) {
             remaining = 0;
         }
@@ -311,7 +290,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const dealCountdown = setInterval(() => {
                     dealRemaining--;
                     
-                    document.getElementById('expiry-time').textContent = `Before the end of the transaction:`;
                     updateDealTimeDisplay(dealRemaining);
                     
                     if (dealRemaining <= 0) {
@@ -358,19 +336,16 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Генерируем новое значение с учетом направления
         let trendMultiplier = isInTrade ? signalTrend : 0;
         
         const newValue = lastRealValue + 
             (trendMultiplier * (Math.random() * 0.2)) + 
-            ((Math.random() - 0.5) * 0.1); // Уменьшил случайные колебания
+            ((Math.random() - 0.5) * 0.1);
 
-        // Обновляем данные
         data.shift();
         data.splice(realLength - 1, 0, newValue);
         data.length = realLength + paddingRight;
 
-        // Обновляем цвет линии
         dataset.borderColor = 
             trendMultiplier === 1 ? '#00b894' :
             trendMultiplier === -1 ? '#d63031' :
@@ -387,68 +362,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const categorySelect = document.getElementById('category-select');
     const assetSelect = document.getElementById('asset-select');
     const getSignalBtn = document.getElementById('get-signal-btn');
+    const analyzingContainer = document.getElementById('analyzing-container');
+    const signalResult = document.getElementById('signal-result');
     
-    // Данные для выпадающих списков
     const assets = {
         currencies: [
-            {value: "AUD/CAD OTC", text: "AUD/CAD OTC"},
-            {value: "AUD/NZD OTC", text: "AUD/NZD OTC"},
-            {value: "BHD/CNY OTC", text: "BHD/CNY OTC"},
-            {value: "CAD/CHF OTC", text: "CAD/CHF OTC"},
-            {value: "CAD/JPY OTC", text: "CAD/JPY OTC"},
-            {value: "CHF/JPY OTC", text: "CHF/JPY OTC"},
-            {value: "EUR/JPY OTC", text: "EUR/JPY OTC"},
-            {value: "EUR/RUB OTC", text: "EUR/RUB OTC"},
-            {value: "GBP/USD OTC", text: "GBP/USD OTC"},
-            {value: "KES/USD OTC", text: "KES/USD OTC"},
-            {value: "LBP/USD OTC", text: "LBP/USD OTC"},
-            {value: "NZD/JPY OTC", text: "NZD/JPY OTC"},
-            {value: "USD/IDR OTC", text: "USD/IDR OTC"},
-            {value: "USD/EGP OTC", text: "USD/EGP OTC"},
-            {value: "USD/COP OTC", text: "USD/COP OTC"},
-            {value: "USD/CLP OTC", text: "USD/CLP OTC"},
-            {value: "USD/BDT OTC", text: "USD/BDT OTC"},
-            {value: "USD/ARS OTC", text: "USD/ARS OTC"},
-            {value: "QAR/CNY OTC", text: "QAR/CNY OTC"},
-            {value: "OMR/CNY OTC", text: "OMR/CNY OTC"},
-            {value: "USD/MXN OTC", text: "USD/MXN OTC"},
-            {value: "USD/MYR OTC", text: "USD/MYR OTC"},
-            {value: "USD/PHP OTC", text: "USD/PHP OTC"},
-            {value: "USD/RUB OTC", text: "USD/RUB OTC"},
-            {value: "CAD/CHF OTC", text: "CAD/CHF OTC"},
-            {value: "CHF/NOK OTC", text: "CHF/NOK OTC"},
-            {value: "EUR/USD OTC", text: "EUR/USD OTC"},
-            {value: "AED/CNY OTC", text: "AED/CNY OTC"},
-            {value: "GBP/AUD OTC", text: "GBP/AUD OTC"},
-            {value: "USD/ARS OTC", text: "USD/ARS OTC"},
-            {value: "JOD/CNY OTC", text: "JOD/CNY OTC"},
-            {value: "YER/USD OTC", text: "YER/USD OTC"}
+            {value: "AUD/CAD OTC", text: "AUD/CAD OTC"}, {value: "AUD/NZD OTC", text: "AUD/NZD OTC"}, {value: "BHD/CNY OTC", text: "BHD/CNY OTC"},
+            {value: "CAD/CHF OTC", text: "CAD/CHF OTC"}, {value: "CAD/JPY OTC", text: "CAD/JPY OTC"}, {value: "CHF/JPY OTC", text: "CHF/JPY OTC"},
+            {value: "EUR/JPY OTC", text: "EUR/JPY OTC"}, {value: "EUR/RUB OTC", text: "EUR/RUB OTC"}, {value: "GBP/USD OTC", text: "GBP/USD OTC"},
+            {value: "KES/USD OTC", text: "KES/USD OTC"}, {value: "LBP/USD OTC", text: "LBP/USD OTC"}, {value: "NZD/JPY OTC", text: "NZD/JPY OTC"},
+            {value: "USD/IDR OTC", text: "USD/IDR OTC"}, {value: "USD/EGP OTC", text: "USD/EGP OTC"}, {value: "USD/COP OTC", text: "USD/COP OTC"},
+            {value: "USD/CLP OTC", text: "USD/CLP OTC"}, {value: "USD/BDT OTC", text: "USD/BDT OTC"}, {value: "USD/ARS OTC", text: "USD/ARS OTC"},
+            {value: "QAR/CNY OTC", text: "QAR/CNY OTC"}, {value: "OMR/CNY OTC", text: "OMR/CNY OTC"}, {value: "USD/MXN OTC", text: "USD/MXN OTC"},
+            {value: "USD/MYR OTC", text: "USD/MYR OTC"}, {value: "USD/PHP OTC", text: "USD/PHP OTC"}, {value: "USD/RUB OTC", text: "USD/RUB OTC"},
+            {value: "CHF/NOK OTC", text: "CHF/NOK OTC"}, {value: "EUR/USD OTC", text: "EUR/USD OTC"}, {value: "AED/CNY OTC", text: "AED/CNY OTC"},
+            {value: "GBP/AUD OTC", text: "GBP/AUD OTC"}, {value: "JOD/CNY OTC", text: "JOD/CNY OTC"}, {value: "YER/USD OTC", text: "YER/USD OTC"}
         ],
         crypto: [
-            {value: "Cardano OTC", text: "Cardano OTC"},
-            {value: "BNB OTC", text: "BNB OTC"},
-            {value: "Bitcoin OTC", text: "Bitcoin OTC"},
-            {value: "Dogecoin OTC", text: "Dogecoin OTC"},
-            {value: "Polkadot OTC", text: "Polkadot OTC"},
-            {value: "Ethereum OTC", text: "Ethereum OTC"},
+            {value: "Cardano OTC", text: "Cardano OTC"}, {value: "BNB OTC", text: "BNB OTC"}, {value: "Bitcoin OTC", text: "Bitcoin OTC"},
+            {value: "Dogecoin OTC", text: "Dogecoin OTC"}, {value: "Polkadot OTC", text: "Polkadot OTC"}, {value: "Ethereum OTC", text: "Ethereum OTC"},
             {value: "Solana OTC", text: "Solana OTC"}
         ],
         commodities: [
-            {value: "Brent Oil OTC", text: "Brent Oil OTC"},
-            {value: "WTI Crude Oil OTC", text: "WTI Crude Oil OTC"},
-            {value: "Silver OTC", text: "Silver OTC"},
-            {value: "Gold OTC", text: "Gold OTC"},
-            {value: "Natural Gas OTC", text: "Natural Gas OTC"},
-            {value: "Palladium spot OTC", text: "Palladium spot OTC"},
+            {value: "Brent Oil OTC", text: "Brent Oil OTC"}, {value: "WTI Crude Oil OTC", text: "WTI Crude Oil OTC"}, {value: "Silver OTC", text: "Silver OTC"},
+            {value: "Gold OTC", text: "Gold OTC"}, {value: "Natural Gas OTC", text: "Natural Gas OTC"}, {value: "Palladium spot OTC", text: "Palladium spot OTC"},
             {value: "Platinum spot OTC", text: "Platinum spot OTC"}
         ],
         stocks: [
-            {value: "McDonald's OTC", text: "McDonald's OTC"},
-            {value: "Tesla OTC", text: "Tesla OTC"},
-            {value: "Amazon OTC", text: "Amazon OTC"},
-            {value: "Coinbase Global OTC", text: "Coinbase Global OTC"},
-            {value: "VISA OTC", text: "VISA OTC"},
-            {value: "Alibaba OTC", text: "Alibaba OTC"},
+            {value: "McDonald's OTC", text: "McDonald's OTC"}, {value: "Tesla OTC", text: "Tesla OTC"}, {value: "Amazon OTC", text: "Amazon OTC"},
+            {value: "Coinbase Global OTC", text: "Coinbase Global OTC"}, {value: "VISA OTC", text: "VISA OTC"}, {value: "Alibaba OTC", text: "Alibaba OTC"},
             {value: "Netflix OTC", text: "Netflix OTC"}
         ]
     };
@@ -457,23 +399,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     assetSelect.addEventListener('change', function() {
         getSignalBtn.disabled = this.value === '';
-        // Note: The logic for showing/hiding buttons is already handled elsewhere,
-        // so we just focus on enabling/disabling here.
+        getSignalBtn.classList.remove('hidden');
+        analyzingContainer.classList.add('hidden');
+        signalResult.classList.add('hidden');
     });
-            
-    // Обработчик изменения категории
+    
     categorySelect.addEventListener('change', function() {
         const selectedCategory = this.value;
-        
-        // Очищаем список активов
         assetSelect.innerHTML = '<option value="">Select asset</option>';
-        getSignalBtn.disabled = true; // Disable button when category changes
-        
+        getSignalBtn.disabled = true;
+
         if (selectedCategory) {
-            // Активируем выбор актива
             assetSelect.disabled = false;
-            
-            // Заполняем список активов в зависимости от выбранной категории
             assets[selectedCategory].forEach(asset => {
                 const option = document.createElement('option');
                 option.value = asset.value;
@@ -481,19 +418,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 assetSelect.appendChild(option);
             });
         } else {
-            // Деактивируем выбор актива, если категория не выбрана
             assetSelect.disabled = true;
         }
     });
-            
-    // Обновление времени (This function is duplicated, but keeping for structural integrity of your code)
-    function updateTime() {
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString(); // Uses local default format
-        // This might conflict with the other updateTime, ensure IDs are correct if you merge
-        // document.getElementById('current-time').textContent = timeStr;
-    }
-            
-    setInterval(updateTime, 1000);
-    updateTime();
 });
